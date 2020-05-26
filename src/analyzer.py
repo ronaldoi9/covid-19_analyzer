@@ -41,12 +41,11 @@ def make_graph_map(region_geojson, dataFrame):
                            color_continuous_scale="OrRd", featureidkey="properties.sigla",
                            center={"lat": -15, "lon": -47},
                            hover_name='Province_State',
-                           projection='mercator',
+                           range_color=(0, 50000),
                            scope='south america', template='plotly_dark',
-                           labels={'Confirmed_05-23-2020':'Confirmed Cases'},
-                           title="Casos confirmados de COVID-19 no Brasil"
+                           labels={'Confirmed_05-23-2020':'Confirmed Cases'}
                           )
-    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+    fig.update_layout(margin={"r":0,"t":0,"l":1,"b":0})
     fig.write_html('../graphics/brazilian_confirmed_cases.html')
 
     return fig

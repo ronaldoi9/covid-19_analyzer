@@ -36,14 +36,3 @@ brazilian_confirmed_series.to_csv('brazilian covid-19 data/brazilian_confirmed_s
 brazilian_deaths_series.to_csv('brazilian covid-19 data/brazilian_deaths_series.csv', index=False)
 brazilian_recovered_series.to_csv('brazilian covid-19 data/brazilian_recovered_series.csv', index=False)
 brazilian_active_series.to_csv('brazilian covid-19 data/brazilian_active_series.csv', index=False)
-
-    
-    
-
-    
-
-
-
-
-
-# make_graph_map(brazilian_state_geo, cleared_brazilian_covid_19_data)
