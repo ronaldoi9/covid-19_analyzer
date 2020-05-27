@@ -1,8 +1,8 @@
 import pandas as pd
 import json
 from datetime import date, timedelta
-from analyzer import clean_unknown_rows_covid_19_df, make_graph_map
 from convert_state_name import convert_state_name_to_uf
+from analyzer import clean_unknown_rows_covid_19_df, make_graph_map, get_initial_day, date_format, get_number_of_collect_days
  
 brazilian_state_geo = '../data/brazilian geo data/brazil-states.geojson'
 with open(brazilian_state_geo) as file:
@@ -16,14 +16,13 @@ brazilian_active_series = pd.DataFrame()
 # get the actual day
 today = date.today()
 
-# search start day
-initial_day = date(2020, 5, 20)
+initial_day = get_initial_day()
 
-# difference of days
-number_of_days = (today - initial_day).days
+# number of days collected
+number_of_days = get_number_of_collect_days()
 
 for day in [initial_day + timedelta(i) for i in range(number_of_days)]:
-    day = day.strftime('%m-%d-%Y')
+    day = date_format(day)
     covid_19_data = pd.read_csv(f'../data/world covid-19 data/{day}.csv')
 
     brazilian_covid_19_data = covid_19_data.loc[covid_19_data['Country_Region'] == 'Brazil']

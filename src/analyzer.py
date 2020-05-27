@@ -64,8 +64,21 @@ def make_graph_map(region_geojson, dataFrame):
 
     return fig
 
-def get_actual_day():
-    return (date.today() - timedelta(1)).strftime('%m-%d-%Y')
+# search start day
+def get_initial_day():
+    return date(2020, 5, 20)
+
+def convert_day_number_to_date(number_day):
+    if number_day < 0:
+        return (date.today() - timedelta(number_day * (-1))).strftime('%m-%d-%Y')
+    else:
+        return (date.today() - timedelta(1)).strftime('%m-%d-%Y')
+
+def date_format(day):
+    return day.strftime('%m-%d-%Y')
+
+def get_number_of_collect_days():
+    return (date.today() - get_initial_day()).days
 
 def filter_data_distribution_to_show(options):
 

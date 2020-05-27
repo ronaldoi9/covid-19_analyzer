@@ -2,7 +2,7 @@ import json, sys
 sys.path.append('/home/ronaldo/Documentos/Python Projects/Covid-19 Analyzer/src/')
 import streamlit as st
 import plotly.express as px
-from analyzer import get_actual_day
+from analyzer import get_number_of_collect_days, convert_day_number_to_date
 from analyzer import filter_data_distribution_to_show, filter_range_color, filter_map_color
 
 # function to load treated boston dataset
@@ -41,8 +41,13 @@ def make_graph_map(dataFrame, option, day):
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
     return fig
 
+
+number_of_days = get_number_of_collect_days() - 1
+
 # show by default the actual day
-day = get_actual_day()
+days_ago = st.slider(f'LINHA TEMPORAL DE {option_selected}', (number_of_days * -1), -1, format=f'%d Dias')
+
+day = convert_day_number_to_date(days_ago)
 
 # filter interest to show in graph
 data_to_show = filter_data_distribution_to_show(option_selected)
