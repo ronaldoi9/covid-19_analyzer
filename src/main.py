@@ -2,8 +2,8 @@ import pandas as pd
 import json
 from datetime import date, timedelta
 from convert_state_name import convert_state_name_to_uf
-from analyzer import clean_unknown_rows_covid_19_df, make_graph_map, get_initial_day, date_format, get_number_of_collect_days
- 
+from analyzer import clean_unknown_rows_covid_19_df, get_initial_day, date_format, get_last_day_of_collection, get_number_of_collect_days
+
 brazilian_state_geo = '../data/brazilian geo data/brazil-states.geojson'
 with open(brazilian_state_geo) as file:
     br_geo_data = json.load(file)    
@@ -21,7 +21,7 @@ initial_day = get_initial_day()
 # number of days collected
 number_of_days = get_number_of_collect_days()
 
-for day in [initial_day + timedelta(i) for i in range(number_of_days)]:
+for day in [initial_day + timedelta(i) for i in range(number_of_days + 1)]:
     day = date_format(day)
     covid_19_data = pd.read_csv(f'../data/world covid-19 data/{day}.csv')
 
