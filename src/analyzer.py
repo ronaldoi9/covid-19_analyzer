@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import os.path as path
 import json
+from convert_state_name import convert_state_name_to_capital_name
 
 def get_brazilian_confirmed_cases():
     return pd.read_csv('../data/brazilian covid-19 data/brazilian_confirmed_series.csv')
@@ -87,6 +88,9 @@ def get_last_day_of_collection():
 def get_cities_by_state(state_name, brazil_cities):
     df_uf_states = pd.read_csv('../data/brazilian geo data/uf-states.csv')
 
+    if state_name == 'Espirito Santo':
+        state_name = 'Espírito Santo'
+
     df_uf_states = df_uf_states.loc[df_uf_states['nome'] == state_name]
 
     uf_state = df_uf_states['codigo_uf'].values[0]
@@ -110,11 +114,24 @@ def get_covid_19_city_data(df_historic_cities, city_choised, option):
 
     length_data = len(df_historic_cities)
 
-    if option == 'CASOS ACUMULADOS':
-        return df_historic_cities['casosAcumulado'].values[length_data - 1]
-    elif option == 'CASOS NOVOS':
-        return df_historic_cities['casosNovos'].values[length_data - 1]
-    elif option == 'ÓBITOS ACUMULADOS':
-        return df_historic_cities['obitosAcumulado'].values[length_data - 1]
-    else:
-        return df_historic_cities['obitosNovos'].values[length_data - 1]
+    try:
+        if option == 'CASOS ACUMULADOS':
+            return df_historic_cities['casosAcumulado'].values[length_data - 1]
+        elif option == 'CASOS NOVOS':
+            return df_historic_cities['casosNovos'].values[length_data - 1]
+        elif option == 'ÓBITOS ACUMULADOS':
+            return df_historic_cities['obitosAcumulado'].values[length_data - 1]
+        else:
+            return df_historic_cities['obitosNovos'].values[length_data - 1]
+            
+    except IndexError:
+        return 0
+
+def get_capital_index(state_name, brazil_cities_list):
+
+    if state_name == 'Espirito Santo':
+        state_name = 'Espírito Santo'
+
+    capital_name = convert_state_name_to_capital_name(state_name.upper())
+
+    return list(map(lambda city: city.upper(), brazil_cities_list)).index(capital_name)
