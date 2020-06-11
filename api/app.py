@@ -5,7 +5,7 @@ import pandas as pd
 import plotly.express as px
 import pydeck as pdk
 import numpy as np
-from analyzer import get_initial_day, date_format, get_last_day_of_collection, get_cities_by_state, get_lat_and_long, get_covid_19_city_data
+from analyzer import get_initial_day, date_format, get_last_day_of_collection, get_cities_by_state, get_lat_and_long, get_covid_19_city_data, get_capital_index
 from analyzer import get_dataframe_selected_by_option, filter_range_color, filter_map_color, filter_historic_df_by_cities
 
 # st.cache tag indicate that func must be stay in cache to speed up process
@@ -41,7 +41,7 @@ if button_analyze == 'CIDADES':
                         'São Paulo', 'Sergipe', 'Tocantins']
 
   state_choised = st.sidebar.selectbox(
-      'Selecione o estado', brazilian_states, index=12)
+      'Selecione ou digite estado', brazilian_states, index=12)
 
 st.sidebar.title("Data de Análise")
 
@@ -61,9 +61,12 @@ if button_analyze == 'CIDADES':
 
   st.subheader('Informe o nome da cidade e o estado que deseja analisar')
 
+  cities_by_state = get_cities_by_state(state_choised, brazilian_cities_geo_data)
+  capital_index = get_capital_index(state_choised, cities_by_state)
+
   city_choised = st.selectbox(
-    'Digite no formato especificado abaixo', 
-    get_cities_by_state(state_choised, brazilian_cities_geo_data), index=65)
+    'Selecione ou digite o nome da cidade', 
+    cities_by_state, index=capital_index)
 
 else:
   option_selected = st.selectbox(
@@ -89,9 +92,8 @@ def make_graph_map(dataFrame, option, day):
     return fig
 
 def make_cities_graph(cities_data):
- 
   dframes = []
-  layers = []
+  layers = []  
 
   for i in range(len(cities_data)):
     dframes.append(pd.DataFrame(np.random.randn(cities_data[i]['n_casos'], 2) / [30,50] + [cities_data[i]['lat'], cities_data[i]['lon']], 
@@ -113,11 +115,10 @@ def make_cities_graph(cities_data):
   st.pydeck_chart(pdk.Deck(
     map_style='mapbox://styles/mapbox/light-v9',
     initial_view_state=pdk.ViewState(
-        latitude=cities_data[i]['lat'],
-        longitude=cities_data[i]['lon'], 
+        latitude=cities_data[len(cities_data) - 1]['lat'],
+        longitude=cities_data[len(cities_data) - 1]['lon'], 
         zoom=11,
-        pitch=50,
-    ),
+        pitch=50),
     layers=[layers],
     ))
   
@@ -147,5 +148,6 @@ with st.spinner('Carregando gráfico...'):
       'lon': lat_and_lon['lon']
     }]
 
+    st.info(f'{option_selected}: {covid_19_city_data}')
     make_cities_graph(city_data)
 
