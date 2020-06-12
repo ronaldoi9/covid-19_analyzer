@@ -7,7 +7,7 @@ import pydeck as pdk
 import numpy as np
 from os import path
 from analyzer import get_initial_day, date_format, get_last_day_of_collection, get_cities_by_state, get_lat_and_long, get_covid_19_city_data, get_capital_index
-from analyzer import get_dataframe_selected_by_option, filter_range_color, filter_map_color, filter_historic_df_by_cities
+from analyzer import get_dataframe_selected_by_option, filter_range_color, filter_map_color, filter_historic_df_by_cities, get_last_day_of_historic_collection
 
 # st.cache tag indicate that func must be stay in cache to speed up process
 @st.cache(allow_output_mutation=True)
@@ -44,20 +44,22 @@ if button_analyze == 'CIDADES':
   state_choised = st.sidebar.selectbox(
       'Selecione ou digite estado', brazilian_states, index=12)
 
-st.sidebar.title("Data de Análise")
-
-days_ago = st.sidebar.date_input(f'Selecione a data que deseja analisar', value=get_last_day_of_collection(), min_value=get_initial_day(), max_value=get_last_day_of_collection())
+  st.sidebar.title("Data de Análise")
+else:
+  st.sidebar.title("Data de Análise")
+  days_ago = st.sidebar.date_input(f'Selecione a data que deseja analisar', value=get_last_day_of_collection(), min_value=get_initial_day(), max_value=get_last_day_of_collection())
 
 # =====================================================================================
 
 st.title(f"Analisando o impacto da COVID-19 no Brasil")
 
 # subtitle
-st.markdown("Este Data App foi construido para analisar os diferentes cenários de COVID-19 no Brasil")
+st.markdown("Este Data App foi construido para analisar os diferentes cenários de COVID-19 nos estados e cidades do Brasil")
 
 if button_analyze == 'CIDADES':
 
   city_data = []
+  city_to_compare_selected = False
   df_cities = get_brazilian_historic_data_frame()
 
   option_selected = st.selectbox(
@@ -72,6 +74,9 @@ if button_analyze == 'CIDADES':
   city_choised = st.selectbox(
     'Selecione ou digite o nome da cidade', 
     cities_by_state, index=capital_index)
+
+  historic_data = get_last_day_of_historic_collection(df_cities, city_choised, option_selected)
+  st.sidebar.info(f'Os dados são correspondente ao histórico da cidade coletados até a data {historic_data}, pelo site do governo do Brasil')
 
   lat_and_lon = get_lat_and_long(city_choised, brazilian_cities_geo_data)
   covid_19_city_data = get_covid_19_city_data(df_cities, city_choised, option_selected)
@@ -98,11 +103,12 @@ if button_analyze == 'CIDADES':
       cities_by_state, index=capital_index+1)
 
     if st.button('Adicionar cidade no gráfico'):
-      covid_19_city_data = get_covid_19_city_data(df_cities, city_to_compare, option_selected)
+      city_to_compare_selected = True
+      covid_19_city_to_compare_data = get_covid_19_city_data(df_cities, city_to_compare, option_selected)
       lat_and_lon = get_lat_and_long(city_to_compare, brazilian_cities_geo_data)
 
       city_data.append({
-        'n_casos': covid_19_city_data,
+        'n_casos': covid_19_city_to_compare_data,
         'lat': lat_and_lon['lat'],
         'lon': lat_and_lon['lon']
       })
@@ -112,6 +118,7 @@ else:
     ('CASOS CONFIRMADOS', 'NÚMERO DE MORTOS', 'CASOS RECUPERADOS', 'CASOS ATIVOS'))
 
   data_to_show = get_dataframe_selected_by_option(option_selected)
+  day = date_format(days_ago)
 
 st.subheader("COVID-19 no Brasil")
 
@@ -168,8 +175,6 @@ def make_cities_graph(cities_data):
         pitch=50),
     layers=[layers],
     ))
-  
-day = date_format(days_ago)
 
 with st.spinner('Carregando gráfico...'):
   # plot data distribution
@@ -177,6 +182,10 @@ with st.spinner('Carregando gráfico...'):
     figure = make_graph_map(data_to_show, option_selected, day)
     st.plotly_chart(figure)
   else:    
-    st.info(f'{option_selected}: {covid_19_city_data}')
+    if city_to_compare_selected:
+      st.info(f'{option_selected} NA CIDADE DE {city_choised.upper()}: {covid_19_city_data}')
+      st.info(f'{option_selected} NA CIDADE DE {city_to_compare.upper()}: {covid_19_city_to_compare_data}')
+    else:
+      st.info(f'{option_selected} NA CIDADE DE {city_choised.upper()}: {covid_19_city_data}')
     make_cities_graph(city_data)
 
