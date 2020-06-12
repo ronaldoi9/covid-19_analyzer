@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from convert_state_name import convert_state_name_to_uf
 from analyzer import clean_unknown_rows_covid_19_df, get_initial_day, date_format, get_last_day_of_collection, get_number_of_collect_days
 
-brazilian_historic = pd.read_csv(f'../data/brazilian covid-19 data/historic_data_02-06.csv', low_memory=False)
+brazilian_historic = pd.read_excel(f'../data/brazilian covid-19 data/HIST_PAINEL_COVIDBR_11jun2020.xlsx')
 brazilian_historic.drop(columns=['Recuperadosnovos', 'emAcompanhamentoNovos', 'semanaEpi', 
                                 'codRegiaoSaude', 'coduf', 'codmun', 'nomeRegiaoSaude'], 
                                 inplace=True)

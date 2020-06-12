@@ -58,7 +58,7 @@ def filter_range_color(option):
     if option == 'NÚMERO DE MORTOS':
         return (0, 2500)
     elif option == 'CASOS RECUPERADOS':
-        return (0, 50)
+        return (0, 50000)
     elif option == 'CASOS ATIVOS':
         return (0, 50000)
     else:
@@ -126,6 +126,17 @@ def get_covid_19_city_data(df_historic_cities, city_choised, option):
             
     except IndexError:
         return 0
+
+def get_last_day_of_historic_collection(df_historic_cities, city_choised, option):
+
+    df_historic_cities = df_historic_cities.loc[df_historic_cities['municipio'] == city_choised]
+
+    length_data = len(df_historic_cities)
+
+    try:
+        return df_historic_cities['data'].values[length_data - 1]
+    except IndexError:
+        return get_last_day_of_collection()
 
 def get_capital_index(state_name, brazil_cities_list):
 
